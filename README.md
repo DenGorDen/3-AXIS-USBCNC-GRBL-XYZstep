@@ -8,18 +8,18 @@ GRBL 1.1 for 3-AXIS + step driver 28byj-48
   //	0  Y1_STEP_BIT					        		SPINDLE_DIRECTION_BIT
   //	1  Y2_STEP_BIT					        		SPINDLE_ENABLE_BIT
   //	2  Y3_STEP_BIT									    unconnected
-  //	3  Y4_STEP_BIT								    COOLANT_MIST_BIT
+  //	3  Y4_STEP_BIT								      COOLANT_MIST_BIT
   //	4  Z1_STEP_BIT							   	    COOLANT_FLOOD_BIT
-  //	5  Z2_STEP_BIT								    CONTROL_RESET_BIT
-  //	6  Z3_STEP_BIT								    CONTROL_FEED_HOLD_BIT
-  //	7  Z4_STEP_BIT								    CONTROL_CYCLE_START_BIT
+  //	5  Z2_STEP_BIT								      CONTROL_RESET_BIT
+  //	6  Z3_STEP_BIT								      CONTROL_FEED_HOLD_BIT
+  //	7  Z4_STEP_BIT								      CONTROL_CYCLE_START_BIT
   //	8  SPINDLE_PWM_BIT							    CONTROL_SAFETY_DOOR_BIT
-  //	9  PROBE	                	                X1_STEP_BIT
-  //	10 reserved for UART1 	                        X2_STEP_BIT
-  //	11 usb											X3_STEP_BIT
-  //	12 usb											X4_STEP_BIT
-  //	13 swd, possible to use for	C_STEP_BIT			X_LIMIT_BIT
-  //	14 swd, possible to use for	C_DIRECTION_BIT		Y_LIMIT_BIT
+  //	9  PROBE	                	        X1_STEP_BIT
+  //	10 reserved for UART1 	            X2_STEP_BIT
+  //	11 usb											        X3_STEP_BIT
+  //	12 usb										        	X4_STEP_BIT
+  //	13 swd, 	                      		X_LIMIT_BIT
+  //	14 swd, 	                        	Y_LIMIT_BIT
   //	15 STEPPERS_DISABLE_BIT							Z_LIMIT_BIT
 
    Внесено змінну #define XYZ_AXIS_step до config.h для роботи проекту.
