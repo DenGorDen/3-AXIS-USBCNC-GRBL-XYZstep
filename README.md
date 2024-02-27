@@ -46,7 +46,8 @@ GRBL 1.1 for 3-AXIS + step driver 28byj-48
    Частота кроку становить 137 гц, що дозволяє підключити кроковий двигун 28byj-48 (100 гц).
    Можна трохи змінити початковий шаблон кроку current_ _step = 0001, або 0011, для імітації півкроку.
    режим півкроку не реалізовано.
-   якщо закоментувати #define XYZ_AXIS_step і розкоментувати #define ABC_AXIS_EXAMPLE проект повернеться 
+   
+   Якщо закоментувати #define XYZ_AXIS_step і розкоментувати #define ABC_AXIS_EXAMPLE проект повернеться 
    у вихідний стан як https://github.com/robomechs/6-AXIS-USBCNC-GRBL
    
    Готова прошивка лежить у папці Debug, проект скомпільований в Atollic TrueSTUDIO 
