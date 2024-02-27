@@ -48,4 +48,5 @@ GRBL 1.1 for 3-AXIS + step driver 28byj-48
    режим півкроку не реалізовано.
    якщо закоментувати #define XYZ_AXIS_step і розкоментувати #define ABC_AXIS_EXAMPLE проект повернеться 
    у вихідний стан як https://github.com/robomechs/6-AXIS-USBCNC-GRBL
-   готова прошивка лежить у папці Debug, проект скомпільований в Atollic TrueSTUDIO 
+   
+   Готова прошивка лежить у папці Debug, проект скомпільований в Atollic TrueSTUDIO 
