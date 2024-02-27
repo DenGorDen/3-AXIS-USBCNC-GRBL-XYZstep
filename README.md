@@ -1,53 +1,41 @@
-# 3-AXIS-USBCNC-GRBL-XYZstep
-GRBL 1.1 for 3-AXIS + step driver 28byj-48
+# up to 6-AXIS-USBCNC-GRBL
+This repository is based on [usbcnc grbl](https://github.com/usbcnc/grbl) which in turn is based on [native grbl 1.1f](https://github.com/gnea/grbl)<br>
+With 6-AXIS-USBCNC-GRBL you can use 3,4(default),5 or 6 axis depend on definition in config.h
+<img width="842" alt="stm32f103-usbcnc-pinout" src="https://user-images.githubusercontent.com/8062959/50537633-57946b80-0b73-11e9-92f8-e4ee15e2e923.png"><br>
+Also there are some bugs (from usbcnc grbl) were fixed and some improvements were done.
+Some of them:
+- migrate from coIDE to Atollic truestudio
+- 4,5,6th axis were added
+- uint16_t probe_invert_mask
+- [issue#36](https://github.com/usbcnc/grbl/issues/36) from usbcnc
+- [issue#38](https://github.com/usbcnc/grbl/issues/38) from usbcnc
+- [issue#41](https://github.com/usbcnc/grbl/issues/41) from usbcnc
+- [issue#46](https://github.com/usbcnc/grbl/issues/46) from usbcnc
+- [issue#40](https://github.com/usbcnc/grbl/issues/40) from usbcnc
+- [issue#49](https://github.com/usbcnc/grbl/issues/49) from usbcnc
+- NEW: STP_DRIVERS_ENABLE_DELAY
+- [issue#48](https://github.com/usbcnc/grbl/issues/48) from usbcnc. STEP_PULSE_DELAY now works
+- GPIO_PinRemapConfig(GPIO_Remap_SWJ_JTAGDisable, ENABLE); // to enable PA15, PB3, PB4 pins
+- NEW: USE_RESET_BTN_AS_ESTOP
+- improved performance and stability in stepper.c [issue#48](https://github.com/usbcnc/grbl/issues/48) from usbcnc
+- [issue#60](https://github.com/usbcnc/grbl/issues/60) from usbcnc
+- [issue#61](https://github.com/usbcnc/grbl/issues/61) from usbcnc
 
-За основу взято проект https://github.com/robomechs/6-AXIS-USBCNC-GRBL у якому було модифіковано файл cpu_map.h для керування кроковими двигунами в режимі цілого кроку.
-Підключення двигунів 28byj-48 до плати stm32f103 :
+Before homing "error:7" appears 2 times due to startup blocks are empty. It's ok.
+To eliminate this: set the startup blocks or comment definition in config.h
 
-//	Port A  
-  //	0  Y1_STEP_BIT  
-  //	1  Y2_STEP_BIT  
-  //	2  Y3_STEP_BIT  
-  //	3  Y4_STEP_BIT  
-  //	4  Z1_STEP_BIT  
-  //	5  Z2_STEP_BIT  
-  //	6  Z3_STEP_BIT  
-  //	7  Z4_STEP_BIT  
-  //	8  SPINDLE_PWM_BIT  
-  //	9  PROBE  
-  //	10 reserved  
-  //	11 usb  
-  //	12 usb  
-  //	13 swd 
-  //	14 swd  
-  //	15 STEPPERS_DISABLE_BIT  
-  
-  //	Port B  
-  //	0  SPINDLE_DIRECTION_BIT  
-  //	1  SPINDLE_ENABLE_BIT  
-  //	2  unconnected  
-  //	3  COOLANT_MIST_BIT  
-  //	4  COOLANT_FLOOD_BIT  
-  //	5  CONTROL_RESET_BIT  
-  //	6  CONTROL_FEED_HOLD_BIT  
-  //	7  CONTROL_CYCLE_START_BIT  
-  //	8  CONTROL_SAFETY_DOOR_BIT  
-  //	9  X1_STEP_BIT  
-  //	10 X2_STEP_BIT  
-  //	11 X3_STEP_BIT  
-  //	12 X4_STEP_BIT  
-  //	13 X_LIMIT_BIT  
-  //	14 Y_LIMIT_BIT  
-  //	15 Z_LIMIT_BIT  
-  
-   Внесено змінну #define XYZ_AXIS_step до config.h для роботи проекту.
-   Продубльовані налаштування для роботи проекту у файлі defaults.h у режимі XYZ_AXIS_step.
-   Модифіковано також файли stepper.c, додано код у режимі XYZ_AXIS_step.
-   Частота кроку становить 137 гц, що дозволяє підключити кроковий двигун 28byj-48 (100 гц).
-   Можна трохи змінити початковий шаблон кроку current_ _step = 0001, або 0011, для імітації півкроку.
-   режим півкроку не реалізовано.
-   
-   Якщо закоментувати #define XYZ_AXIS_step і розкоментувати #define ABC_AXIS_EXAMPLE проект повернеться 
-   у вихідний стан як https://github.com/robomechs/6-AXIS-USBCNC-GRBL
-   
-   Готова прошивка лежить у папці Debug, проект скомпільований в Atollic TrueSTUDIO 
+## Get started
+- Install Atollic truestudio
+- add this project to Atollic
+- (<b>optional!</b>) configure grbl with config.h (<b>4 axis by default</b>. You can't change it through the grbl interface) and default.h (you can change this settings later throught the grbl interface)
+- (<b>optional!</b> do this if you did the previous step) compille it
+- use [st-link v2](https://www.st.com/content/st_com/en/products/development-tools/hardware-development-tools/development-tool-hardware-for-mcus/debug-hardware-for-mcus/debug-hardware-for-stm32-mcus/st-link-v2.html#design-scroll) or China clones for downloading firmware to [bluepill](http://wiki.stm32duino.com/index.php?title=Blue_Pill)
+- configure grbl with "$x=val" commands (optional)
+- use grbl controller with [UGS](https://winder.github.io/ugs_website/), [GcodeSender
+](https://github.com/OttoHermansson/GcodeSender/downloads), [OpenCNCPilot
+](https://github.com/martin2250/OpenCNCPilot) or other interfaces.
+<br>
+
+- You can also use UART (TX1, RX1) instead of USB to connect grbl controller via bluetooth and use with android app ["Grbl Controller"](https://play.google.com/store/apps/details?id=in.co.gorest.grblcontroller&hl=ru). Just #undef USEUSB in grbl.h after #ifdef STM32F103C8 or delete "USEUSB" in project properties -> C/C++ General -> Path and Symbols -> Symbols.
+- If you want to use UART and more then 4 axis, you can map "B" axis Step and Dir outputs to PA11,12 instead of PA9,10 (see cpu-map.h).
+- Don't map any pins if not sure. Some of them use microcontroller hardware features which aren't available on the other ones. 
