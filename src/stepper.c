@@ -207,21 +207,17 @@ static stepper_t st;
 
 
 #ifdef XYZ_AXIS_step                                                                                //my code
-     bool new_step = false; // статус наявности нового кроку
+     bool new_step = false; // Г±ГІГ ГІГіГ± Г­Г ГїГўГ­Г®Г±ГІГЁ Г­Г®ГўГ®ГЈГ® ГЄГ°Г®ГЄГі
 /*     static BitAction nOnFlag = Bit_SET;                             // my variable for LED13*/
 
-     static uint8_t current_X_step = 0b00010001; // 0001 - шаблон початковий step X - AXIS
-     static uint8_t current_Y_step = 0b00010001; // 0001 - шаблон початковий step Y - AXIS
-     static uint8_t current_Z_step = 0b00010001; // 0001 - шаблон початковий
+     static uint8_t current_X_step = 0b00010001; // 0001 - ГёГ ГЎГ«Г®Г­ ГЇГ®Г·Г ГІГЄГ®ГўГЁГ© step X - AXIS
+     static uint8_t current_Y_step = 0b00010001; // 0001 - ГёГ ГЎГ«Г®Г­ ГЇГ®Г·Г ГІГЄГ®ГўГЁГ© step Y - AXIS
+     static uint8_t current_Z_step = 0b00010001; // 0001 - ГёГ ГЎГ«Г®Г­ ГЇГ®Г·Г ГІГЄГ®ГўГЁГ©
      static uint8_t immobilized_x=0, immobilized_y=0, immobilized_z=0;
-	 // Bit field and masking macros
-	 #define shift_step(dir,step) ((dir < 1) ? ((step << 1)|(step >> 7)):((step >> 1)|(step << 7)))
+	 // Bit field and masking macros	
      #define numberstep(dir,step) ((dir < 1) ? (step < 7 ? step + 1 : 0):(step > 0 ?  step - 1 : 7));
-   //  #define count_val(c)(c>0 ? c-1 : 0)
-
     static uint8_t fullsteps[8] = { //step
-    		 0b00010001,
-			 0b00100010,
+    		 0b00010001,			 0b00100010,
 			 0b01000100,
 			 0b10001000,
 			 0b00010001,
@@ -238,16 +234,8 @@ static stepper_t st;
      			 0b11001100,
      			 0b10001000,
      			 0b10011001
-     };
-   /*   typedef struct {
-     unsigned short currXstep : 3 ;
-     } ste;
-     static ste cu ;*/
-
+     };   
 #endif
-
-
-
 
 // Step segment ring buffer indices
 static volatile uint8_t segment_buffer_tail;
@@ -451,7 +439,7 @@ void st_go_idle()
 	  ResetStepperDisableBit();
   }
 #ifdef XYZ_AXIS_step                                                                                            //my code
-	// после віполнения сигнала шага , отключаем вісокий уровень на пинах порта
+	// ГЇГ®Г±Г«ГҐ ГўВіГЇГ®Г«Г­ГҐГ­ГЁГї Г±ГЁГЈГ­Г Г«Г  ГёГ ГЈГ  , Г®ГІГЄГ«ГѕГ·Г ГҐГ¬ ГўВіГ±Г®ГЄГЁГ© ГіГ°Г®ГўГҐГ­Гј Г­Г  ГЇГЁГ­Г Гµ ГЇГ®Г°ГІГ 
 				//                       00010000 & 00001111  = 00000000
 	 X_STEP_PORT->ODR = ((X_STEP_PORT->ODR & ~X_STEPMOTOR__MASK) | (0 & X_STEPMOTOR__MASK));
 	 Y_STEP_PORT->ODR = ((Y_STEP_PORT->ODR & ~Y_STEPMOTOR__MASK) | (0 & Y_STEPMOTOR__MASK));
@@ -561,42 +549,38 @@ void Timer1Proc()
 	//uint8_t mode_status = settings.stepper_idle_lock_time;
 
 //X-AXIS func begin
-   if(st.step_outbits & (1<<X_STEP_BIT)){//we find out if there is a step impulse, if it’s not 0 it means we’re taking a step
+   if(st.step_outbits & (1<<X_STEP_BIT)){//we find out if there is a step impulse, if itВ’s not 0 it means weВ’re taking a step
 	  current_X_step = numberstep((st.dir_outbits & (1<<X_DIRECTION_BIT)), current_X_step);
        if(settings.stepper_idle_lock_time & (1<<X_STEP_BIT)){shift_X_step = fullsteps[current_X_step];
-       }else {  shift_X_step = microsteps[current_X_step]; }
-	 	// current_X_step = shift_step((st.dir_outbits & (1<<X_DIRECTION_BIT)),current_X_step);
-	   // B9-це початковий пин
-	  shift_X_step = shift_X_step<<9; // B9-це початковий пин
+       }else {  shift_X_step = microsteps[current_X_step]; }	 	
+	  shift_X_step = shift_X_step<<9; // B9-Г¶ГҐ ГЇГ®Г·Г ГІГЄГ®ГўГЁГ© ГЇГЁГ­
       //                           00010000 & 00001111 = 00000000 |    00100000  & 11110000 = 00100000   ---> 00100000
 	  X_STEP_PORT->ODR = ((X_STEP_PORT->ODR & ~X_STEPMOTOR__MASK) | (shift_X_step & X_STEPMOTOR__MASK));
-	  immobilized_x = 0;  // новий крок
+	  immobilized_x = 0;  // Г­Г®ГўГЁГ© ГЄГ°Г®ГЄ
       };
 //X-AXIS func end
 
 //Y-AXIS func begin
-   if(st.step_outbits & (1<<Y_STEP_BIT)){//we find out if there is a step impulse, if it’s not 0 it means we’re taking a step
+   if(st.step_outbits & (1<<Y_STEP_BIT)){//we find out if there is a step impulse, if itВ’s not 0 it means weВ’re taking a step
 	 current_Y_step = numberstep((st.dir_outbits & (1<<Y_DIRECTION_BIT)), current_Y_step);
 	  if(settings.stepper_idle_lock_time & (1<<Y_STEP_BIT)){shift_Y_step = fullsteps[current_Y_step];
-	  }else {  shift_Y_step = microsteps[current_Y_step]; }
-	  // current_Y_step = shift_step((st.dir_outbits & (1<<Y_DIRECTION_BIT)),current_Y_step);
+	  }else {  shift_Y_step = microsteps[current_Y_step]; }	 
 	  //shift_Y_step  = shift_Y_step<<0;
 	  //                           00010001 & 00001111 = 00000001 |       00100010  & 11110000 = 00100000   ---> 00100001
       Y_STEP_PORT->ODR = ((Y_STEP_PORT->ODR & ~Y_STEPMOTOR__MASK) | (shift_Y_step & Y_STEPMOTOR__MASK));
-      immobilized_y = 0; // новий крок
+      immobilized_y = 0; // Г­Г®ГўГЁГ© ГЄГ°Г®ГЄ
       };
 //Y-AXIS func end
 
 //Z-AXIS func begin
-   if(st.step_outbits & (1<<Z_STEP_BIT)){//we find out if there is a step impulse, if it’s not 0 it means we’re taking a step
+   if(st.step_outbits & (1<<Z_STEP_BIT)){//we find out if there is a step impulse, if itВ’s not 0 it means weВ’re taking a step
 	 current_Z_step = numberstep((st.dir_outbits & (1<<Z_DIRECTION_BIT)), current_Z_step);
 	  if(settings.stepper_idle_lock_time & (1<<Z_STEP_BIT)){shift_Z_step = fullsteps[current_Z_step];
-	  }else {  shift_Z_step = microsteps[current_Z_step]; }
-	  //current_Z_step = shift_step((st.dir_outbits & (1<<Z_DIRECTION_BIT)),current_Z_step);
-      //shift_Z_step  = shift_Z_step<<4; // непотрібно тому що пини 0-3 та 4-7 в шаблоні повторюються (тількі для порту А)
+	  }else {  shift_Z_step = microsteps[current_Z_step]; }	  
+      //shift_Z_step  = shift_Z_step<<4; // Г­ГҐГЇГ®ГІГ°ВіГЎГ­Г® ГІГ®Г¬Гі Г№Г® ГЇГЁГ­ГЁ 0-3 ГІГ  4-7 Гў ГёГ ГЎГ«Г®Г­Ві ГЇГ®ГўГІГ®Г°ГѕГѕГІГјГ±Гї (ГІВіГ«ГјГЄВі Г¤Г«Гї ГЇГ®Г°ГІГі ГЂ)
       //                           00010001 & 11110000 = 00010000 |       00100010  & 00001111 = 00000010   ---> 00010010
 	  Z_STEP_PORT->ODR = ((Z_STEP_PORT->ODR & ~Z_STEPMOTOR__MASK) | (shift_Z_step & Z_STEPMOTOR__MASK));
-	  immobilized_z = 0;// новий крок
+	  immobilized_z = 0;// Г­Г®ГўГЁГ© ГЄГ°Г®ГЄ
       };
 //Z-AXIS func end
    #else
@@ -604,8 +588,6 @@ void Timer1Proc()
 	  DIRECTION_PORT->ODR = ((DIRECTION_PORT->ODR & ~DIRECTION_MASK) | (st.dir_outbits & DIRECTION_MASK));
    #endif
 #endif
-
-
 #ifdef AVRTARGET
   // Then pulse the stepping pins
   #ifdef STEP_PULSE_DELAY
@@ -621,7 +603,7 @@ void Timer1Proc()
     #else  // Normal operation
       #ifndef XYZ_AXIS_step                                                                                          //my code off for XYZ_AXIS_step
       STEP_PORT->ODR = ((STEP_PORT->ODR & ~STEP_MASK) | st.step_outbits);
-     //GPIO_Write(STEP_PORT, (GPIO_ReadOutputData(STEP_PORT) & ~STEP_MASK) | st.step_outbits); //вкл. импульс
+     //GPIO_Write(STEP_PORT, (GPIO_ReadOutputData(STEP_PORT) & ~STEP_MASK) | st.step_outbits); //ГўГЄГ«. ГЁГ¬ГЇГіГ«ГјГ±
       #endif
     #endif
 #endif
