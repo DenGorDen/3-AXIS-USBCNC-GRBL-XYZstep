@@ -216,7 +216,34 @@ static stepper_t st;
      static uint8_t immobilized_x=0, immobilized_y=0, immobilized_z=0;
 	 // Bit field and masking macros
 	 #define shift_step(dir,step) ((dir < 1) ? ((step << 1)|(step >> 7)):((step >> 1)|(step << 7)))
+     #define numberstep(dir,step) ((dir < 1) ? (step < 7 ? step + 1 : 0):(step > 0 ?  step - 1 : 7));
    //  #define count_val(c)(c>0 ? c-1 : 0)
+
+    static uint8_t fullsteps[8] = { //step
+    		 0b00010001,
+			 0b00100010,
+			 0b01000100,
+			 0b10001000,
+			 0b00010001,
+			 0b00100010,
+			 0b01000100,
+			 0b10001000
+     };
+     static uint8_t microsteps[8] = { //microstep
+         		 0b00010001,
+     			 0b00110011,
+     			 0b00100010,
+     			 0b01100110,
+     			 0b01000100,
+     			 0b11001100,
+     			 0b10001000,
+     			 0b10011001
+     };
+   /*   typedef struct {
+     unsigned short currXstep : 3 ;
+     } ste;
+     static ste cu ;*/
+
 #endif
 
 
@@ -527,13 +554,20 @@ void Timer1Proc()
 
   //shifting the position of the pins into place
 			  uint16_t shift_X_step = 0;
-	//		  uint8_t shift_Y_step = 0;
-	//		  uint8_t shift_Z_step = 0;
+			  uint8_t shift_Y_step = 0;   // uint16_t
+			  uint8_t shift_Z_step = 0;   // uint16_t
+
+  //get status AXIS to fullsteps or microsteps
+	//uint8_t mode_status = settings.stepper_idle_lock_time;
 
 //X-AXIS func begin
    if(st.step_outbits & (1<<X_STEP_BIT)){//we find out if there is a step impulse, if itТs not 0 it means weТre taking a step
-	  current_X_step = shift_step((st.dir_outbits & (1<<X_DIRECTION_BIT)),current_X_step);
-	  shift_X_step = current_X_step<<9; // B9-це початковий пин
+	  current_X_step = numberstep((st.dir_outbits & (1<<X_DIRECTION_BIT)), current_X_step);
+       if(settings.stepper_idle_lock_time & (1<<X_STEP_BIT)){shift_X_step = fullsteps[current_X_step];
+       }else {  shift_X_step = microsteps[current_X_step]; }
+	 	// current_X_step = shift_step((st.dir_outbits & (1<<X_DIRECTION_BIT)),current_X_step);
+	   // B9-це початковий пин
+	  shift_X_step = shift_X_step<<9; // B9-це початковий пин
       //                           00010000 & 00001111 = 00000000 |    00100000  & 11110000 = 00100000   ---> 00100000
 	  X_STEP_PORT->ODR = ((X_STEP_PORT->ODR & ~X_STEPMOTOR__MASK) | (shift_X_step & X_STEPMOTOR__MASK));
 	  immobilized_x = 0;  // новий крок
@@ -542,20 +576,26 @@ void Timer1Proc()
 
 //Y-AXIS func begin
    if(st.step_outbits & (1<<Y_STEP_BIT)){//we find out if there is a step impulse, if itТs not 0 it means weТre taking a step
-	  current_Y_step = shift_step((st.dir_outbits & (1<<Y_DIRECTION_BIT)),current_Y_step);
-	  //shift_Y_step  = current_Y_step<<0;
+	 current_Y_step = numberstep((st.dir_outbits & (1<<Y_DIRECTION_BIT)), current_Y_step);
+	  if(settings.stepper_idle_lock_time & (1<<Y_STEP_BIT)){shift_Y_step = fullsteps[current_Y_step];
+	  }else {  shift_Y_step = microsteps[current_Y_step]; }
+	  // current_Y_step = shift_step((st.dir_outbits & (1<<Y_DIRECTION_BIT)),current_Y_step);
+	  //shift_Y_step  = shift_Y_step<<0;
 	  //                           00010001 & 00001111 = 00000001 |       00100010  & 11110000 = 00100000   ---> 00100001
-      Y_STEP_PORT->ODR = ((Y_STEP_PORT->ODR & ~Y_STEPMOTOR__MASK) | (current_Y_step & Y_STEPMOTOR__MASK));
+      Y_STEP_PORT->ODR = ((Y_STEP_PORT->ODR & ~Y_STEPMOTOR__MASK) | (shift_Y_step & Y_STEPMOTOR__MASK));
       immobilized_y = 0; // новий крок
       };
 //Y-AXIS func end
 
 //Z-AXIS func begin
    if(st.step_outbits & (1<<Z_STEP_BIT)){//we find out if there is a step impulse, if itТs not 0 it means weТre taking a step
-      current_Z_step = shift_step((st.dir_outbits & (1<<Z_DIRECTION_BIT)),current_Z_step);
-      //shift_Z_step  = current_Z_step<<4; // непотр≥бно тому що пини 0-3 та 4-7 в шаблон≥ повторюютьс€ (т≥льк≥ дл€ порту ј)
+	 current_Z_step = numberstep((st.dir_outbits & (1<<Z_DIRECTION_BIT)), current_Z_step);
+	  if(settings.stepper_idle_lock_time & (1<<Z_STEP_BIT)){shift_Z_step = fullsteps[current_Z_step];
+	  }else {  shift_Z_step = microsteps[current_Z_step]; }
+	  //current_Z_step = shift_step((st.dir_outbits & (1<<Z_DIRECTION_BIT)),current_Z_step);
+      //shift_Z_step  = shift_Z_step<<4; // непотр≥бно тому що пини 0-3 та 4-7 в шаблон≥ повторюютьс€ (т≥льк≥ дл€ порту ј)
       //                           00010001 & 11110000 = 00010000 |       00100010  & 00001111 = 00000010   ---> 00010010
-	  Z_STEP_PORT->ODR = ((Z_STEP_PORT->ODR & ~Z_STEPMOTOR__MASK) | (current_Z_step & Z_STEPMOTOR__MASK));
+	  Z_STEP_PORT->ODR = ((Z_STEP_PORT->ODR & ~Z_STEPMOTOR__MASK) | (shift_Z_step & Z_STEPMOTOR__MASK));
 	  immobilized_z = 0;// новий крок
       };
 //Z-AXIS func end
